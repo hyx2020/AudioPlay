@@ -3,6 +3,7 @@ apply from: file('config.gradle')
 
 buildscript {
     apply from: file('config.gradle')
+    ext.arouter_register_version = '1.0.2'
 
     repositories {
         google()
@@ -11,6 +12,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${libVesrion.kotlin_sn}"
+        classpath "com.alibaba:arouter-register:$arouter_register_version"
     }
 }
 
