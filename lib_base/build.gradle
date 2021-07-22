@@ -2,6 +2,14 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+}
+
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+        arg("AROUTER_GENERATE_DOC": "enable")
+    }
 }
 
 android {
@@ -15,15 +23,15 @@ android {
         versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [AROUTER_MODULE_NAME: project.getName(), AROUTER_GENERATE_DOC: "enable"]
-            }
-        }
     }
 
     buildTypes {
+        debug {
+            buildConfigField 'boolean', 'IS_DEBUG', "true"
+        }
         release {
+            buildConfigField 'boolean', 'IS_DEBUG', "false"
+
             minifyEnabled rootProject.ext.android.minifyEnabled
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -43,8 +51,7 @@ dependencies {
     api rootProject.lib.appcompat_version
     api rootProject.lib.core_ktx_version
     api rootProject.lib.constraintlayout_version
-    annotationProcessor 'com.alibaba:arouter-compiler:1.5.2'
-    api 'com.alibaba:arouter-annotation:1.0.6'
+    kapt 'com.alibaba:arouter-compiler:1.5.2'
     api 'com.alibaba:arouter-api:1.5.2'
 
     testImplementation 'junit:junit:4.13'

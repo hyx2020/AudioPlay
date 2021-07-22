@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">lib_base</string>
+    <string name="init_entry">Hello World!</string>
+    <string name="base_test_text">这是一个ARouter测试跳转界面</string>
 </resources>
