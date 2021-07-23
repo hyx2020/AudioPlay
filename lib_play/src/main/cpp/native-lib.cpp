@@ -1,11 +1,8 @@
-#include <jni.h>
-#include <string>
+#include "audio/audioRecord.hpp"
+#include "audio/audioTrack.hpp"
 
-
-#include <android/log.h>
-#define LOG_TAG "DISTANCE_ESTIMATE"
+#define LOG_TAG "Native"
 #define LOGD(...) __android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__)
-
 
 extern "C" JNIEXPORT void JNICALL
 Java_org_hyx_lib_1play_JniLib_detection(

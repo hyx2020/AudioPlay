@@ -5,6 +5,14 @@ if (isDebug == "debug"){
 }
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
+
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.getName())
+        arg("AROUTER_GENERATE_DOC": "enable")
+    }
+}
 
 android {
     ndkVersion "22.1.7171670"
@@ -25,12 +33,6 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags ""
-            }
-        }
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = [AROUTER_MODULE_NAME: project.getName(), AROUTER_GENERATE_DOC: "enable"]
             }
         }
     }
@@ -62,6 +64,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':lib_base')
+
+    kapt rootProject.lib.a_router_version
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

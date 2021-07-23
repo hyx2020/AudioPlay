@@ -3,6 +3,9 @@ apply from: file('config.gradle')
 
 buildscript {
     apply from: file('config.gradle')
+    ext {
+        kotlin_version = '1.5.10'
+    }
     ext.arouter_register_version = '1.0.2'
 
     repositories {
