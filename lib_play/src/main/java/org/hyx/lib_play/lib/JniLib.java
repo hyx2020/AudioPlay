@@ -1,12 +1,12 @@
-package org.hyx.lib_play;
+package org.hyx.lib_play.lib;
 
 import kotlin.jvm.JvmStatic;
 
 public class JniLib {
-    private static JniLib self;
+    private static final JniLib self;
 
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("audio-lib-hyx");
         self = new JniLib();
     }
 

@@ -15,7 +15,7 @@ class ARouterTestActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.base_arouter_test)
+        setContentView(R.layout.base_activity_arouter_test)
 
         Log.e("testRes", "name = $name, age = $age")
     }

@@ -37,14 +37,18 @@ android {
     }
     buildFeatures {
         viewBinding true
+        dataBinding true
     }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation project(path: ':lib_play')
     implementation project(path: ':lib_base')
+
+    if (isDebug != "debug"){
+        implementation project(path: ':lib_play')
+    }
 
     kapt rootProject.lib.a_router_version
 

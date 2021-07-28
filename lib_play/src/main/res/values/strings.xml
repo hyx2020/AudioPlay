@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">lib_play</string>
+    <string name="play_audio_api">Audio API</string>
+    <string name="play_buffer_size_description_key">description</string>
+    <string name="play_buffer_size_value_key">value</string>
+    <string name="play_audio_api_description_key">description</string>
 </resources>
