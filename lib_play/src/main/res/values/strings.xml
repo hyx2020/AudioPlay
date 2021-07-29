@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">lib_play</string>
     <string name="play_audio_api">Audio API</string>
-    <string name="play_buffer_size_description_key">description</string>
-    <string name="play_buffer_size_value_key">value</string>
-    <string name="play_audio_api_description_key">description</string>
+    <string name="play_recording_device">Recording device</string>
+    <string name="play_playback_device">Playback device</string>
+    <string name="play_auto_select">Auto select</string>
+    <string name="play_buffer_size">Buffer size</string>
+    <string name="play_channel_out">Channel count</string>
 </resources>

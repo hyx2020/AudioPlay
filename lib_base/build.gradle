@@ -67,6 +67,10 @@ dependencies {
 
     api rootProject.lib.google_material_version
 
+    api rootProject.lib.kotlinx_coroutines_core_version
+
+    api rootProject.lib.kotlinx_coroutines_android_version
+
     kapt rootProject.lib.a_router_version
     api rootProject.lib.a_router_api_version
 
