@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 set(APP_SOURCES
         jni_bridge.cpp
-        audio/AudioOboeEngine.cpp
+        audio/FullDuplexStream.cpp
+        audio/LiveEffectEngine.cpp
         )
 
 add_library(audio-lib-hyx
