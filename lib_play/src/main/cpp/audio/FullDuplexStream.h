@@ -19,6 +19,7 @@
 
 #include <unistd.h>
 #include <sys/types.h>
+#include <jni.h>
 
 #include "oboe/Oboe.h"
 
@@ -72,6 +73,7 @@ public:
      */
     void setNumInputBurstsCushion(int32_t numInputBurstsCushion);
 
+    jfloatArray getAudioData(JNIEnv *env);
 private:
 
     // TODO add getters and setters
@@ -96,6 +98,9 @@ private:
 
     int32_t              mBufferSize = 0;
     std::unique_ptr<float[]> mInputBuffer;
+    const int maxMemory = 48000;
+    std::unique_ptr<float[]> mOutputBuffer = std::make_unique<float[]>(maxMemory);
+    int32_t              indexOutputBuffer = 0;
 };
 
 

@@ -51,7 +51,7 @@ public:
     bool setAudioApi(oboe::AudioApi);
     bool isAAudioRecommended(void);
     void setInputChannelCount(int count);
-
+    jfloatArray getAudioData(JNIEnv *env);
 private:
     FullDuplexPass    mFullDuplexPass;
     bool              mIsEffectOn = false;

@@ -103,10 +103,11 @@ Java_org_hyx_lib_1play_lib_AudioEngine_isAAudioRecommended(JNIEnv *env, jobject 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_native_1setDefaultStreamValues(JNIEnv *env, jobject thiz, jint default_sample_rate, jint default_frames_per_burst) {
+Java_org_hyx_lib_1play_lib_AudioEngine_nativeSetDefaultStreamValues(JNIEnv *env, jobject thiz, jint default_sample_rate, jint default_frames_per_burst) {
     oboe::DefaultStreamValues::SampleRate = (int32_t) default_sample_rate;
     oboe::DefaultStreamValues::FramesPerBurst = (int32_t) default_frames_per_burst;
 }
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_org_hyx_lib_1play_lib_AudioEngine_setChannelInput(JNIEnv *env, jobject thiz, jint channel) {
@@ -115,4 +116,15 @@ Java_org_hyx_lib_1play_lib_AudioEngine_setChannelInput(JNIEnv *env, jobject thiz
         return;
     }
     engine->setInputChannelCount(channel);
+}
+
+extern "C"
+JNIEXPORT jfloatArray JNICALL
+Java_org_hyx_lib_1play_lib_AudioEngine_getAudioArray(JNIEnv *env, jobject thiz) {
+    if (engine == nullptr) {
+        LOGE("Engine is null, you must call createEngine before calling this method");
+        return nullptr;
+    }
+
+    return engine->getAudioData(env);
 }

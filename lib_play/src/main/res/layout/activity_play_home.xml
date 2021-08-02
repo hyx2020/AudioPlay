@@ -208,8 +208,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/tiny_padding"
+            android:layout_marginLeft="@dimen/tiny_padding"
             android:text="@string/play_audio_record_start" />
 
         <Button
@@ -217,16 +217,16 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/tiny_padding"
+            android:layout_marginLeft="@dimen/tiny_padding"
             android:text="@string/play_audio_play_start" />
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:text="@string/play_audio_record_save_true" />
+            android:layout_marginStart="@dimen/tiny_padding"
+            android:layout_marginLeft="@dimen/tiny_padding"
+            android:text="@string/play_audio_record_save" />
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

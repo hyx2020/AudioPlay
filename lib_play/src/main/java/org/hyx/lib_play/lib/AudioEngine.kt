@@ -45,6 +45,10 @@ class AudioEngine {
             self.setChannelInput(count)
         }
 
+        fun getShortArray(): FloatArray {
+            return self.getAudioArray()
+        }
+
         init {
             System.loadLibrary("audio-lib-hyx")
             self = AudioEngine()
@@ -54,11 +58,12 @@ class AudioEngine {
     fun setDefaultStreamValues(context: Context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             val myAudioMgr = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-            val sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
-            val defaultSampleRate = sampleRateStr.toInt()
+/*            val sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
+            val defaultSampleRate = sampleRateStr.toInt()*/
+            val defaultSampleRate = 48000
             val framesPerBurstStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)
             val defaultFramesPerBurst = framesPerBurstStr.toInt()
-            self.native_setDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst)
+            self.nativeSetDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst)
         }
     }
 
@@ -71,5 +76,6 @@ class AudioEngine {
     external fun setPlaybackDeviceId(deviceId: Int)
     external fun setChannelInput(channel: Int)
     external fun delete()
-    external fun native_setDefaultStreamValues(defaultSampleRate: Int, defaultFramesPerBurst: Int)
+    private external fun nativeSetDefaultStreamValues(defaultSampleRate: Int, defaultFramesPerBurst: Int)
+    external fun getAudioArray(): FloatArray
 }

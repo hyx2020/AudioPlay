@@ -241,3 +241,7 @@ void LiveEffectEngine::setInputChannelCount(int count) {
     mInputChannelCount = count;
     //mOutputChannelCount = count;
 }
+
+jfloatArray LiveEffectEngine::getAudioData(JNIEnv *env) {
+    return mFullDuplexPass.getAudioData(env);
+}

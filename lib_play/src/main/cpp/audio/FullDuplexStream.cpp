@@ -15,7 +15,7 @@
  */
 
 #include "FullDuplexStream.h"
-#include "../../../../../oboe/src/common/OboeDebug.h"
+#include "../../../../../../oboe/src/common/OboeDebug.h"
 
 oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         oboe::AudioStream *outputStream,
@@ -33,8 +33,8 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         int32_t totalFramesRead = 0;
         do {
             oboe::ResultWithValue<int32_t> result = mInputStream->read(mInputBuffer.get(),
-                                                                           numFrames,
-                                                                           0 /* timeout */);
+                                                                       numFrames,
+                                                                       0 /* timeout */);
             if (!result) {
                 // Ignore errors because input stream may not be started yet.
                 break;
@@ -54,8 +54,8 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
     } else if (mCountCallbacksToDiscard > 0) {
         // Ignore. Allow the input to reach to equilibrium with the output.
         oboe::ResultWithValue<int32_t> result = mInputStream->read(mInputBuffer.get(),
-                                                                       numFrames,
-                                                                       0 /* timeout */);
+                                                                   numFrames,
+                                                                   0 /* timeout */);
         if (!result) {
             callbackResult = oboe::DataCallbackResult::Stop;
         }
@@ -64,8 +64,8 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
     } else {
         // Read data into input buffer.
         oboe::ResultWithValue<int32_t> result = mInputStream->read(mInputBuffer.get(),
-                                                                       numFrames,
-                                                                       0 /* timeout */);
+                                                                   numFrames,
+                                                                   0 /* timeout */);
         if (!result) {
             callbackResult = oboe::DataCallbackResult::Stop;
         } else {
@@ -78,11 +78,19 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         }
     }
 
+    LOGE("-------------:%d, %d, %f, %f", numFrames, numBytes, mInputBuffer[0], mInputBuffer[numFrames - 1]);
+
     if (callbackResult == oboe::DataCallbackResult::Stop) {
         mInputStream->requestStop();
     }
 
-    LOGE("-------------:%d, %d, %f, %f", numFrames, numBytes, mInputBuffer[0] * 16384, mInputBuffer[191] * 16384);
+    if ((indexOutputBuffer + numFrames) > maxMemory) {
+        memset(mOutputBuffer.get(), 0, indexOutputBuffer);
+        indexOutputBuffer = 0;
+    }
+
+    memcpy(mOutputBuffer.get() + indexOutputBuffer, mInputBuffer.get(), numBytes);
+    indexOutputBuffer += numFrames;
     return callbackResult;
 }
 
@@ -93,7 +101,7 @@ oboe::Result FullDuplexStream::start() {
 
     // Determine maximum size that could possibly be called.
     int32_t bufferSize = mOutputStream->getBufferCapacityInFrames()
-            * mOutputStream->getChannelCount();
+                         * mOutputStream->getChannelCount();
     if (bufferSize > mBufferSize) {
         mInputBuffer = std::make_unique<float[]>(bufferSize);
         mBufferSize = bufferSize;
@@ -127,4 +135,10 @@ int32_t FullDuplexStream::getNumInputBurstsCushion() const {
 
 void FullDuplexStream::setNumInputBurstsCushion(int32_t numBursts) {
     FullDuplexStream::mNumInputBurstsCushion = numBursts;
+}
+
+jfloatArray FullDuplexStream::getAudioData(JNIEnv *env) {
+    jfloatArray res = env->NewFloatArray(indexOutputBuffer);
+    env->SetFloatArrayRegion(res, 0, indexOutputBuffer, mOutputBuffer.get());
+    return res;
 }

@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.hyx.lib_base.FunShare
 import org.hyx.lib_play.R
 import org.hyx.lib_play.databinding.ActivityPlayHomeBinding
 import org.hyx.lib_play.lib.AudioEngine
@@ -17,6 +18,7 @@ import org.hyx.lib_play.parameter.OboeAudioManager
 import org.hyx.lib_play.parameter.SpinnerAdapterFactory
 import org.hyx.lib_play.parameter.SpinnerAdapterFactory.Companion.itemDescription
 import org.hyx.lib_play.parameter.SpinnerAdapterFactory.Companion.itemValue
+import java.util.*
 import kotlin.collections.HashMap
 
 class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -102,6 +104,11 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
                     AudioEngine.setEffectOn(false)
                     binding.playRecordStart.text = getString(R.string.play_audio_record_start)
                     binding.playHomeLog.text = getString(R.string.play_audio_record_stop)
+
+
+                    Thread {
+                        FunShare.save(AudioEngine.getShortArray(), this)
+                    }.start()
                 }
             }
             binding.playPlaybackStart.id -> {
