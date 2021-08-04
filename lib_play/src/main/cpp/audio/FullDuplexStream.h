@@ -98,9 +98,11 @@ private:
 
     int32_t              mBufferSize = 0;
     std::unique_ptr<float[]> mInputBuffer;
-    const int maxMemory = 48000;
+    const int maxMemory = 72000;
     std::unique_ptr<float[]> mOutputBuffer = std::make_unique<float[]>(maxMemory);
     int32_t              indexOutputBuffer = 0;
+    int32_t              loadSize = 0;
+    std::mutex           lock;
 };
 
 

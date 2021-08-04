@@ -78,19 +78,23 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         }
     }
 
-    LOGE("-------------:%d, %d, %f, %f", numFrames, numBytes, mInputBuffer[0], mInputBuffer[numFrames - 1]);
+//    LOGE("-------------:%d, %d, %f, %f", numFrames, numBytes, mInputBuffer[0], mInputBuffer[numFrames - 1]);
 
     if (callbackResult == oboe::DataCallbackResult::Stop) {
         mInputStream->requestStop();
+        return callbackResult;
     }
 
+    lock.lock();
     if ((indexOutputBuffer + numFrames) > maxMemory) {
         memset(mOutputBuffer.get(), 0, indexOutputBuffer);
         indexOutputBuffer = 0;
     }
-
     memcpy(mOutputBuffer.get() + indexOutputBuffer, mInputBuffer.get(), numBytes);
     indexOutputBuffer += numFrames;
+    loadSize += numFrames;
+    lock.unlock();
+
     return callbackResult;
 }
 
@@ -138,7 +142,13 @@ void FullDuplexStream::setNumInputBurstsCushion(int32_t numBursts) {
 }
 
 jfloatArray FullDuplexStream::getAudioData(JNIEnv *env) {
+    lock.lock();
     jfloatArray res = env->NewFloatArray(indexOutputBuffer);
     env->SetFloatArrayRegion(res, 0, indexOutputBuffer, mOutputBuffer.get());
+    memset(mOutputBuffer.get(), 0, indexOutputBuffer);
+    indexOutputBuffer = 0;
+    LOGE("loadSize: %d", loadSize);
+    loadSize = 0;
+    lock.unlock();
     return res;
 }

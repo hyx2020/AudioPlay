@@ -52,6 +52,12 @@ public:
     bool isAAudioRecommended(void);
     void setInputChannelCount(int count);
     jfloatArray getAudioData(JNIEnv *env);
+    void play(float* audio);
+
+    oboe::Result openPlayStream();
+
+    void closePlayStream();
+
 private:
     FullDuplexPass    mFullDuplexPass;
     bool              mIsEffectOn = false;
@@ -62,7 +68,8 @@ private:
     int32_t           mSampleRate = oboe::kUnspecified;
     int32_t           mInputChannelCount = oboe::ChannelCount::Mono;
     int32_t           mOutputChannelCount = oboe::ChannelCount::Mono;
-
+    std::unique_ptr<float[]> mOutputBuffer;
+    int32_t mOutputBufferSize;
 
     std::shared_ptr<oboe::AudioStream> mRecordingStream;
     std::shared_ptr<oboe::AudioStream> mPlayStream;

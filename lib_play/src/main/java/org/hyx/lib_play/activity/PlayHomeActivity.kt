@@ -18,7 +18,9 @@ import org.hyx.lib_play.parameter.OboeAudioManager
 import org.hyx.lib_play.parameter.SpinnerAdapterFactory
 import org.hyx.lib_play.parameter.SpinnerAdapterFactory.Companion.itemDescription
 import org.hyx.lib_play.parameter.SpinnerAdapterFactory.Companion.itemValue
-import java.util.*
+import java.util.concurrent.ScheduledFuture
+import java.util.concurrent.TimeUnit
+import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
 class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener, View.OnClickListener {
@@ -100,26 +102,63 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
                     AudioEngine.setEffectOn(true)
                     binding.playRecordStart.text = getString(R.string.play_audio_record_stop)
                     binding.playHomeLog.text = getString(R.string.play_audio_record_start)
+                    arrayAdd()
                 } else {
                     AudioEngine.setEffectOn(false)
+                    save()
                     binding.playRecordStart.text = getString(R.string.play_audio_record_start)
                     binding.playHomeLog.text = getString(R.string.play_audio_record_stop)
-
-
-                    Thread {
-                        FunShare.save(AudioEngine.getShortArray(), this)
-                    }.start()
                 }
             }
             binding.playPlaybackStart.id -> {
                 if(binding.playPlaybackStart.text == getString(R.string.play_audio_play_start)) {
+                    playStart()
                     binding.playPlaybackStart.text = getString(R.string.play_audio_play_stop)
                     binding.playHomeLog.text = getString(R.string.play_audio_play_start)
                 } else {
+                    playStop()
                     binding.playPlaybackStart.text = getString(R.string.play_audio_play_start)
                     binding.playHomeLog.text = getString(R.string.play_audio_play_stop)
                 }
             }
         }
+    }
+
+    private lateinit var recordSchedule :ScheduledFuture<*>
+    private lateinit var playSchedule :ScheduledFuture<*>
+    private val saveArray = ArrayList<FloatArray>()
+
+    private fun arrayAdd() {
+        recordSchedule = FunShare.schedule.scheduleWithFixedDelay({
+            val array = AudioEngine.getShortArray();
+            saveArray.add(array)
+            println("add ${array.size}")
+        }, 0, 342, TimeUnit.MILLISECONDS);
+    }
+
+    private fun save() {
+        if(!this::recordSchedule.isInitialized) return
+        recordSchedule.cancel(false)
+
+        FunShare.schedule.schedule({
+            FunShare.save(saveArray, this)
+            saveArray.clear()
+        }, 350, TimeUnit.MILLISECONDS)
+    }
+
+    private fun playStart() {
+        AudioEngine.openPlayStream()
+        playSchedule = FunShare.schedule.scheduleWithFixedDelay({
+            AudioEngine.sendAudio(FunShare.getAndPlay(this))
+            println("play once")
+        }, 0, 1, TimeUnit.MILLISECONDS);
+    }
+
+    private fun playStop() {
+        if(!this::playSchedule.isInitialized) return
+        playSchedule.cancel(false)
+        FunShare.schedule.schedule({
+            AudioEngine.closePlayStream()
+        }, 50, TimeUnit.MILLISECONDS)
     }
 }

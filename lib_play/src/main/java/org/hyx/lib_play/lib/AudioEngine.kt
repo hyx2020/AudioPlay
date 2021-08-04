@@ -49,6 +49,18 @@ class AudioEngine {
             return self.getAudioArray()
         }
 
+        fun sendAudio(buffer: FloatArray) {
+            self.writeTrack(buffer)
+        }
+
+        fun openPlayStream() {
+            self.openPlayStream()
+        }
+
+        fun closePlayStream() {
+            self.closePlayStream()
+        }
+
         init {
             System.loadLibrary("audio-lib-hyx")
             self = AudioEngine()
@@ -68,14 +80,17 @@ class AudioEngine {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    external fun create(): Boolean
-    external fun isAAudioRecommended(): Boolean
-    external fun setAPI(apiType: Int): Boolean
-    external fun setEffectOn(isEffectOn: Boolean): Boolean
-    external fun setRecordingDeviceId(deviceId: Int)
-    external fun setPlaybackDeviceId(deviceId: Int)
-    external fun setChannelInput(channel: Int)
-    external fun delete()
+    private external fun create(): Boolean
+    private external fun isAAudioRecommended(): Boolean
+    private external fun setAPI(apiType: Int): Boolean
+    private external fun setEffectOn(isEffectOn: Boolean): Boolean
+    private external fun setRecordingDeviceId(deviceId: Int)
+    private external fun setPlaybackDeviceId(deviceId: Int)
+    private external fun setChannelInput(channel: Int)
+    private external fun delete()
     private external fun nativeSetDefaultStreamValues(defaultSampleRate: Int, defaultFramesPerBurst: Int)
-    external fun getAudioArray(): FloatArray
+    private external fun getAudioArray(): FloatArray
+    private external fun openPlayStream()
+    private external fun writeTrack(buffer: FloatArray)
+    private external fun closePlayStream()
 }

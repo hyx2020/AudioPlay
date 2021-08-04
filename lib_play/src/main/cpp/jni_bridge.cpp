@@ -127,4 +127,32 @@ Java_org_hyx_lib_1play_lib_AudioEngine_getAudioArray(JNIEnv *env, jobject thiz) 
     }
 
     return engine->getAudioData(env);
+}extern "C"
+JNIEXPORT void JNICALL
+Java_org_hyx_lib_1play_lib_AudioEngine_writeTrack(JNIEnv *env, jobject thiz, jfloatArray buffer) {
+    if (engine == nullptr) {
+        LOGE("Engine is null, you must call createEngine before calling this method");
+        return;
+    }
+    jfloat *audio =env->GetFloatArrayElements(buffer, nullptr);
+    engine->play(audio);
+    env->ReleaseFloatArrayElements(buffer, audio, 0);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_hyx_lib_1play_lib_AudioEngine_openPlayStream(JNIEnv *env, jobject thiz) {
+    if (engine == nullptr) {
+        LOGE("Engine is null, you must call createEngine before calling this method");
+        return;
+    }
+    engine->openPlayStream();
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_org_hyx_lib_1play_lib_AudioEngine_closePlayStream(JNIEnv *env, jobject thiz) {
+    if (engine == nullptr) {
+        LOGE("Engine is null, you must call createEngine before calling this method");
+        return;
+    }
+    engine->closePlayStream();
 }
