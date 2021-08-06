@@ -147,18 +147,21 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
     }
 
     private fun playStart() {
-        AudioEngine.openPlayStream()
+        AudioEngine.setEffectOn(true)
+        AudioEngine.setPlayFlag(true)
+        val audio = FunShare.getAndPlay(this)
+
         playSchedule = FunShare.schedule.scheduleWithFixedDelay({
-            AudioEngine.sendAudio(FunShare.getAndPlay(this))
+            AudioEngine.sendAudio(audio, audio.size)
             println("play once")
-        }, 0, 1, TimeUnit.MILLISECONDS);
+        }, 0, 500, TimeUnit.MILLISECONDS);
     }
 
     private fun playStop() {
         if(!this::playSchedule.isInitialized) return
         playSchedule.cancel(false)
         FunShare.schedule.schedule({
-            AudioEngine.closePlayStream()
+            AudioEngine.setEffectOn(false)
         }, 50, TimeUnit.MILLISECONDS)
     }
 }

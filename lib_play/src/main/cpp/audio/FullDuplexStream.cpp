@@ -21,6 +21,7 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         oboe::AudioStream *outputStream,
         void *audioData,
         int numFrames) {
+
     oboe::DataCallbackResult callbackResult = oboe::DataCallbackResult::Continue;
     int32_t actualFramesRead = 0;
 
@@ -69,16 +70,9 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         if (!result) {
             callbackResult = oboe::DataCallbackResult::Stop;
         } else {
-            int32_t framesRead = result.value();
-
-            callbackResult = onBothStreamsReady(
-                    mInputStream, mInputBuffer.get(), framesRead,
-                    mOutputStream, audioData, numFrames
-            );
+            callbackResult = oboe::DataCallbackResult::Continue;
         }
     }
-
-//    LOGE("-------------:%d, %d, %f, %f", numFrames, numBytes, mInputBuffer[0], mInputBuffer[numFrames - 1]);
 
     if (callbackResult == oboe::DataCallbackResult::Stop) {
         mInputStream->requestStop();
@@ -86,13 +80,10 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
     }
 
     lock.lock();
-    if ((indexOutputBuffer + numFrames) > maxMemory) {
-        memset(mOutputBuffer.get(), 0, indexOutputBuffer);
-        indexOutputBuffer = 0;
+    getAudioDeal(numFrames, numBytes);
+    if (isPlay) {
+        sendAudioDeal(audioData, numFrames);
     }
-    memcpy(mOutputBuffer.get() + indexOutputBuffer, mInputBuffer.get(), numBytes);
-    indexOutputBuffer += numFrames;
-    loadSize += numFrames;
     lock.unlock();
 
     return callbackResult;
@@ -118,6 +109,7 @@ oboe::Result FullDuplexStream::start() {
 }
 
 oboe::Result FullDuplexStream::stop() {
+    isPlay = false;
     oboe::Result outputResult = oboe::Result::OK;
     oboe::Result inputResult = oboe::Result::OK;
     if (mOutputStream) {
@@ -151,4 +143,51 @@ jfloatArray FullDuplexStream::getAudioData(JNIEnv *env) {
     loadSize = 0;
     lock.unlock();
     return res;
+}
+
+void FullDuplexStream::setPlayFlag(bool flag) {
+    isPlay = flag;
+}
+
+void FullDuplexStream::sendAudio(float *audio, int size) {
+    lock.lock();
+    if ((indexWriteBuffer + size) <= maxMemory) {
+        memcpy(audio, mWriteBuffer.get(), indexOutputBuffer);
+        indexWriteBuffer += size;
+    } else {
+        indexWriteBuffer = maxMemory;
+        const int len = indexOutputBuffer + size - maxMemory;
+        int starLen = maxMemory - size;
+        float start[starLen];
+        memcpy(start, mWriteBuffer.get() + len, maxMemory - size);  //indexOutputBuffer - len
+        memcpy(mWriteBuffer.get(), start, starLen);
+        memcpy(mWriteBuffer.get() + starLen, audio, size);
+    }
+    lock.unlock();
+}
+
+void FullDuplexStream::getAudioDeal(int numFrames, int32_t numBytes) {
+    if ((indexOutputBuffer + numFrames) > maxMemory) {
+        memset(mOutputBuffer.get(), 0, indexOutputBuffer);
+        indexOutputBuffer = 0;
+    }
+    memcpy(mOutputBuffer.get() + indexOutputBuffer, mInputBuffer.get(), numBytes);
+    indexOutputBuffer += numFrames;
+    loadSize += numFrames;
+}
+
+void FullDuplexStream::sendAudioDeal(void *outputData,
+                                     int numOutputFrames) {
+
+    int size = mOutputStream->getChannelCount() * numOutputFrames;
+    const float *inputFloats = mWriteBuffer.get();
+    auto *outputFloats = static_cast<float *>(outputData);
+    for (int32_t i = 0; i < size; i++) {
+        *outputFloats++ = *inputFloats++;
+    }
+    const int memorySize = maxMemory;
+    float temp[memorySize];
+    memcpy(temp, mWriteBuffer.get(), maxMemory);
+    memset(mWriteBuffer.get(), 0, maxMemory);
+    memcpy(mWriteBuffer.get(), temp + size, maxMemory - size);
 }

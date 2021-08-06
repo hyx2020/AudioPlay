@@ -49,16 +49,12 @@ class AudioEngine {
             return self.getAudioArray()
         }
 
-        fun sendAudio(buffer: FloatArray) {
-            self.writeTrack(buffer)
+        fun setPlayFlag(flag: Boolean) {
+            self.setPlayFlag(flag)
         }
 
-        fun openPlayStream() {
-            self.openPlayStream()
-        }
-
-        fun closePlayStream() {
-            self.closePlayStream()
+        fun sendAudio(andPlay: FloatArray, size: Int) {
+            self.sendAudio(andPlay, size)
         }
 
         init {
@@ -90,7 +86,6 @@ class AudioEngine {
     private external fun delete()
     private external fun nativeSetDefaultStreamValues(defaultSampleRate: Int, defaultFramesPerBurst: Int)
     private external fun getAudioArray(): FloatArray
-    private external fun openPlayStream()
-    private external fun writeTrack(buffer: FloatArray)
-    private external fun closePlayStream()
+    private external fun setPlayFlag(flag: Boolean)
+    private external fun sendAudio(audio: FloatArray, size: Int)
 }

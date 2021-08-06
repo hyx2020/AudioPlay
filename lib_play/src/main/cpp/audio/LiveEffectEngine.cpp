@@ -246,36 +246,10 @@ jfloatArray LiveEffectEngine::getAudioData(JNIEnv *env) {
     return mFullDuplexPass.getAudioData(env);
 }
 
-oboe::Result LiveEffectEngine::openPlayStream() {
-    openStreams();
-    LOGD("---");
-    mFullDuplexPass.start();
-
-    mOutputBufferSize = mPlayStream->getBufferCapacityInFrames() * mPlayStream->getChannelCount();
-    LOGD("aaaa");
-    mOutputBuffer = std::make_unique<float[]>(mOutputBufferSize);
-    LOGD("bbbb");
-    oboe::Result result = mPlayStream->requestStart();
-    LOGD("cccc");
-    if (result != oboe::Result::OK) {
-        LOGE("Failed to start output stream");
-    }
-    return result;
+void LiveEffectEngine::setPlayFlag(bool flag) {
+    mFullDuplexPass.setPlayFlag(flag);
 }
 
-void LiveEffectEngine::play(float *audio) {
-    LOGD("???????");
-    LOGD("%d", mPlayStream->getState());
-    LOGD("111111111");
-    mPlayStream->write(audio, mOutputBufferSize, 0);
-    LOGD("3333333333");
-}
-
-void LiveEffectEngine::closePlayStream() {
-    oboe::Result res = mPlayStream->requestStop();
-    if (res != oboe::Result::OK) {
-        LOGE("停止异常");
-    }
-    LOGD("播放请求停止");
-    closeStreams();
+void LiveEffectEngine::sendAudio(float *audio, int size) {
+    mFullDuplexPass.sendAudio(audio, size);
 }

@@ -51,12 +51,9 @@ public:
     bool setAudioApi(oboe::AudioApi);
     bool isAAudioRecommended(void);
     void setInputChannelCount(int count);
+    void setPlayFlag(bool flag);
+    void sendAudio(float *audio, int size);
     jfloatArray getAudioData(JNIEnv *env);
-    void play(float* audio);
-
-    oboe::Result openPlayStream();
-
-    void closePlayStream();
 
 private:
     FullDuplexPass    mFullDuplexPass;

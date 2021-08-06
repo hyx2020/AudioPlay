@@ -103,7 +103,8 @@ Java_org_hyx_lib_1play_lib_AudioEngine_isAAudioRecommended(JNIEnv *env, jobject 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_nativeSetDefaultStreamValues(JNIEnv *env, jobject thiz, jint default_sample_rate, jint default_frames_per_burst) {
+Java_org_hyx_lib_1play_lib_AudioEngine_nativeSetDefaultStreamValues(JNIEnv *env, jobject thiz, jint default_sample_rate,
+                                                                    jint default_frames_per_burst) {
     oboe::DefaultStreamValues::SampleRate = (int32_t) default_sample_rate;
     oboe::DefaultStreamValues::FramesPerBurst = (int32_t) default_frames_per_burst;
 }
@@ -127,32 +128,28 @@ Java_org_hyx_lib_1play_lib_AudioEngine_getAudioArray(JNIEnv *env, jobject thiz) 
     }
 
     return engine->getAudioData(env);
-}extern "C"
-JNIEXPORT void JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_writeTrack(JNIEnv *env, jobject thiz, jfloatArray buffer) {
-    if (engine == nullptr) {
-        LOGE("Engine is null, you must call createEngine before calling this method");
-        return;
-    }
-    jfloat *audio =env->GetFloatArrayElements(buffer, nullptr);
-    engine->play(audio);
-    env->ReleaseFloatArrayElements(buffer, audio, 0);
 }
 extern "C"
 JNIEXPORT void JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_openPlayStream(JNIEnv *env, jobject thiz) {
+Java_org_hyx_lib_1play_lib_AudioEngine_setPlayFlag(
+        JNIEnv *env,
+        jobject thiz,
+        jboolean flag) {
     if (engine == nullptr) {
         LOGE("Engine is null, you must call createEngine before calling this method");
         return;
     }
-    engine->openPlayStream();
+    engine->setPlayFlag(flag);
 }
+
 extern "C"
 JNIEXPORT void JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_closePlayStream(JNIEnv *env, jobject thiz) {
+Java_org_hyx_lib_1play_lib_AudioEngine_sendAudio(JNIEnv *env, jobject thiz, jfloatArray audio, jint size) {
     if (engine == nullptr) {
         LOGE("Engine is null, you must call createEngine before calling this method");
         return;
     }
-    engine->closePlayStream();
+    jfloat *data = env->GetFloatArrayElements(audio, nullptr);
+    engine->sendAudio(data, size);
+    env->ReleaseFloatArrayElements(audio, data, 0);
 }

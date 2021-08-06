@@ -26,6 +26,7 @@
 class FullDuplexStream : public oboe::AudioStreamCallback {
 public:
     FullDuplexStream() {}
+
     virtual ~FullDuplexStream() = default;
 
     void setInputStream(std::shared_ptr<oboe::AudioStream> stream) {
@@ -47,11 +48,11 @@ public:
     virtual oboe::DataCallbackResult onBothStreamsReady(
             std::shared_ptr<oboe::AudioStream> inputStream,
             const void *inputData,
-            int   numInputFrames,
+            int numInputFrames,
             std::shared_ptr<oboe::AudioStream> outputStream,
             void *outputData,
-            int   numOutputFrames
-            ) = 0;
+            int numOutputFrames
+    ) = 0;
 
     /**
      * Called by Oboe when the stream is ready to process audio.
@@ -74,35 +75,47 @@ public:
     void setNumInputBurstsCushion(int32_t numInputBurstsCushion);
 
     jfloatArray getAudioData(JNIEnv *env);
+
+    void getAudioDeal(int numFrames, int32_t numBytes);
+
+    void sendAudioDeal(void *outputData, int numOutputFrames);
+
+    void setPlayFlag(bool flag);
+
+    void sendAudio(float *audio, int size);
+
 private:
+    bool isPlay = false;
 
     // TODO add getters and setters
-    static constexpr int32_t kNumCallbacksToDrain   = 20;
+    static constexpr int32_t kNumCallbacksToDrain = 20;
     static constexpr int32_t kNumCallbacksToDiscard = 30;
 
     // let input fill back up, usually 0 or 1
-    int32_t              mNumInputBurstsCushion = 1;
+    int32_t mNumInputBurstsCushion = 1;
 
     // We want to reach a state where the input buffer is empty and
     // the output buffer is full.
     // These are used in order.
     // Drain several callback so that input is empty.
-    int32_t              mCountCallbacksToDrain = kNumCallbacksToDrain;
+    int32_t mCountCallbacksToDrain = kNumCallbacksToDrain;
     // Let the input fill back up slightly so we don't run dry.
-    int32_t              mCountInputBurstsCushion = mNumInputBurstsCushion;
+    int32_t mCountInputBurstsCushion = mNumInputBurstsCushion;
     // Discard some callbacks so the input and output reach equilibrium.
-    int32_t              mCountCallbacksToDiscard = kNumCallbacksToDiscard;
+    int32_t mCountCallbacksToDiscard = kNumCallbacksToDiscard;
 
     std::shared_ptr<oboe::AudioStream> mInputStream;
     std::shared_ptr<oboe::AudioStream> mOutputStream;
 
-    int32_t              mBufferSize = 0;
+    int32_t mBufferSize = 0;
     std::unique_ptr<float[]> mInputBuffer;
     const int maxMemory = 72000;
-    std::unique_ptr<float[]> mOutputBuffer = std::make_unique<float[]>(maxMemory);
-    int32_t              indexOutputBuffer = 0;
-    int32_t              loadSize = 0;
-    std::mutex           lock;
+    std::unique_ptr<float[]> mOutputBuffer = std::make_unique<float[]>(maxMemory);  //音频数据
+    std::unique_ptr<float[]> mWriteBuffer = std::make_unique<float[]>(maxMemory);  //音频数据
+    int32_t indexOutputBuffer = 0;
+    int32_t indexWriteBuffer = 0;
+    int32_t loadSize = 0;
+    std::mutex lock;
 };
 
 
