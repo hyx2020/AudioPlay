@@ -22,10 +22,11 @@
 #include <string>
 #include <thread>
 #include "FullDuplexPass.h"
+#include "AAssetDataSource.h"
 
 class LiveEffectEngine : public oboe::AudioStreamCallback {
 public:
-    LiveEffectEngine();
+    explicit LiveEffectEngine(AAssetManager&);
 
     void setRecordingDeviceId(int32_t deviceId);
     void setPlaybackDeviceId(int32_t deviceId);
@@ -52,10 +53,11 @@ public:
     bool isAAudioRecommended(void);
     void setInputChannelCount(int count);
     void setPlayFlag(bool flag);
-    void sendAudio(float *audio, int size);
+    void loopAudio(float *audio, int size);
     jfloatArray getAudioData(JNIEnv *env);
 
 private:
+    AAssetManager&    mAssetManager;
     FullDuplexPass    mFullDuplexPass;
     bool              mIsEffectOn = false;
     int32_t           mRecordingDeviceId = oboe::kUnspecified;
@@ -65,8 +67,7 @@ private:
     int32_t           mSampleRate = oboe::kUnspecified;
     int32_t           mInputChannelCount = oboe::ChannelCount::Mono;
     int32_t           mOutputChannelCount = oboe::ChannelCount::Mono;
-    std::unique_ptr<float[]> mOutputBuffer;
-    int32_t mOutputBufferSize;
+    std::shared_ptr<AAssetDataSource>  mp3;
 
     std::shared_ptr<oboe::AudioStream> mRecordingStream;
     std::shared_ptr<oboe::AudioStream> mPlayStream;

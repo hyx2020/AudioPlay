@@ -21,6 +21,8 @@
 
 class FullDuplexPass : public FullDuplexStream {
 public:
+    FullDuplexPass() {}
+
     virtual oboe::DataCallbackResult
     onBothStreamsReady(
             std::shared_ptr<oboe::AudioStream> inputStream,

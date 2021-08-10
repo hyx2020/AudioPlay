@@ -1,8 +1,8 @@
 package org.hyx.lib_play.lib
 
 import android.content.Context
+import android.content.res.AssetManager
 import android.media.AudioManager
-import android.os.Build
 
 /**
  * created by hyx on 2021/7/23.
@@ -13,7 +13,7 @@ class AudioEngine {
 
         fun create(context: Context): Boolean {
             self.setDefaultStreamValues(context)
-            return self.create()
+            return self.create(context.assets)
         }
 
         fun delete() {
@@ -53,8 +53,8 @@ class AudioEngine {
             self.setPlayFlag(flag)
         }
 
-        fun sendAudio(andPlay: FloatArray, size: Int) {
-            self.sendAudio(andPlay, size)
+        fun loopAudio(andPlay: FloatArray, size: Int) {
+            self.loopAudio(andPlay, size)
         }
 
         init {
@@ -64,7 +64,7 @@ class AudioEngine {
     }
 
     fun setDefaultStreamValues(context: Context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             val myAudioMgr = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
 /*            val sampleRateStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE)
             val defaultSampleRate = sampleRateStr.toInt()*/
@@ -72,11 +72,11 @@ class AudioEngine {
             val framesPerBurstStr = myAudioMgr.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER)
             val defaultFramesPerBurst = framesPerBurstStr.toInt()
             self.nativeSetDefaultStreamValues(defaultSampleRate, defaultFramesPerBurst)
-        }
+        //}
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    private external fun create(): Boolean
+    private external fun create(assetManager: AssetManager): Boolean
     private external fun isAAudioRecommended(): Boolean
     private external fun setAPI(apiType: Int): Boolean
     private external fun setEffectOn(isEffectOn: Boolean): Boolean
@@ -87,5 +87,5 @@ class AudioEngine {
     private external fun nativeSetDefaultStreamValues(defaultSampleRate: Int, defaultFramesPerBurst: Int)
     private external fun getAudioArray(): FloatArray
     private external fun setPlayFlag(flag: Boolean)
-    private external fun sendAudio(audio: FloatArray, size: Int)
+    private external fun loopAudio(audio: FloatArray, size: Int)
 }

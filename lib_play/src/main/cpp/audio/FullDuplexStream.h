@@ -20,12 +20,14 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <jni.h>
+#include <android/asset_manager.h>
 
 #include "oboe/Oboe.h"
+#include "AAssetDataSource.h"
 
 class FullDuplexStream : public oboe::AudioStreamCallback {
 public:
-    FullDuplexStream() {}
+    FullDuplexStream(){}
 
     virtual ~FullDuplexStream() = default;
 
@@ -36,6 +38,8 @@ public:
     void setOutputStream(std::shared_ptr<oboe::AudioStream> stream) {
         mOutputStream = stream;
     }
+
+    void setAudioMp3(std::shared_ptr<AAssetDataSource> &mp3);
 
     virtual oboe::Result start();
 
@@ -78,12 +82,11 @@ public:
 
     void getAudioDeal(int numFrames, int32_t numBytes);
 
-    void sendAudioDeal(void *outputData, int numOutputFrames);
+    void playAudioLoop(void *outputData, int numOutputFrames);
 
     void setPlayFlag(bool flag);
 
-    void sendAudio(float *audio, int size);
-
+    void loopAudio(void *audio, int size);
 private:
     bool isPlay = false;
 
@@ -106,15 +109,17 @@ private:
 
     std::shared_ptr<oboe::AudioStream> mInputStream;
     std::shared_ptr<oboe::AudioStream> mOutputStream;
+    std::shared_ptr<AAssetDataSource>  mp3;
 
     int32_t mBufferSize = 0;
     std::unique_ptr<float[]> mInputBuffer;
     const int maxMemory = 72000;
-    std::unique_ptr<float[]> mOutputBuffer = std::make_unique<float[]>(maxMemory);  //音频数据
-    std::unique_ptr<float[]> mWriteBuffer = std::make_unique<float[]>(maxMemory);  //音频数据
+    std::unique_ptr<float[]> mOutputBuffer = std::make_unique<float[]>(maxMemory);  //输出录音音频数据
+    std::unique_ptr<float[]> mWriteBuffer = std::make_unique<float[]>(maxMemory);  //写入音频数据
     int32_t indexOutputBuffer = 0;
     int32_t indexWriteBuffer = 0;
-    int32_t loadSize = 0;
+    int32_t loadReadSize = 0;
+    int32_t loadPlaySize = 0;
     std::mutex lock;
 };
 

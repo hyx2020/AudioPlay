@@ -15,6 +15,8 @@
  */
 
 #include "FullDuplexStream.h"
+
+#include <utility>
 #include "../../../../../../oboe/src/common/OboeDebug.h"
 
 oboe::DataCallbackResult FullDuplexStream::onAudioReady(
@@ -72,6 +74,10 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
         } else {
             callbackResult = oboe::DataCallbackResult::Continue;
         }
+
+        if (isPlay) {
+            playAudioLoop(audioData, numFrames);
+        }
     }
 
     if (callbackResult == oboe::DataCallbackResult::Stop) {
@@ -81,9 +87,6 @@ oboe::DataCallbackResult FullDuplexStream::onAudioReady(
 
     lock.lock();
     getAudioDeal(numFrames, numBytes);
-    if (isPlay) {
-        sendAudioDeal(audioData, numFrames);
-    }
     lock.unlock();
 
     return callbackResult;
@@ -139,8 +142,8 @@ jfloatArray FullDuplexStream::getAudioData(JNIEnv *env) {
     env->SetFloatArrayRegion(res, 0, indexOutputBuffer, mOutputBuffer.get());
     memset(mOutputBuffer.get(), 0, indexOutputBuffer);
     indexOutputBuffer = 0;
-    LOGE("loadSize: %d", loadSize);
-    loadSize = 0;
+    LOGE("loadReadSize: %d", loadReadSize);
+    loadReadSize = 0;
     lock.unlock();
     return res;
 }
@@ -149,21 +152,11 @@ void FullDuplexStream::setPlayFlag(bool flag) {
     isPlay = flag;
 }
 
-void FullDuplexStream::sendAudio(float *audio, int size) {
-    lock.lock();
-    if ((indexWriteBuffer + size) <= maxMemory) {
-        memcpy(audio, mWriteBuffer.get(), indexOutputBuffer);
-        indexWriteBuffer += size;
-    } else {
-        indexWriteBuffer = maxMemory;
-        const int len = indexOutputBuffer + size - maxMemory;
-        int starLen = maxMemory - size;
-        float start[starLen];
-        memcpy(start, mWriteBuffer.get() + len, maxMemory - size);  //indexOutputBuffer - len
-        memcpy(mWriteBuffer.get(), start, starLen);
-        memcpy(mWriteBuffer.get() + starLen, audio, size);
-    }
-    lock.unlock();
+void FullDuplexStream::loopAudio(void *audio, int size) {
+    mWriteBuffer = std::make_unique<float[]>(size);
+    memcpy(mWriteBuffer.get(), (float *)audio, size);
+    loadPlaySize = size;
+    indexWriteBuffer = 0;
 }
 
 void FullDuplexStream::getAudioDeal(int numFrames, int32_t numBytes) {
@@ -173,21 +166,33 @@ void FullDuplexStream::getAudioDeal(int numFrames, int32_t numBytes) {
     }
     memcpy(mOutputBuffer.get() + indexOutputBuffer, mInputBuffer.get(), numBytes);
     indexOutputBuffer += numFrames;
-    loadSize += numFrames;
+    loadReadSize += numFrames;
 }
 
-void FullDuplexStream::sendAudioDeal(void *outputData,
+void FullDuplexStream::playAudioLoop(void *outputData,
                                      int numOutputFrames) {
 
     int size = mOutputStream->getChannelCount() * numOutputFrames;
-    const float *inputFloats = mWriteBuffer.get();
+    const float *inputFloats = mWriteBuffer.get() + indexWriteBuffer;
     auto *outputFloats = static_cast<float *>(outputData);
     for (int32_t i = 0; i < size; i++) {
-        *outputFloats++ = *inputFloats++;
+        if(i < loadPlaySize) {
+            *outputFloats++ = *inputFloats++;
+        } else {
+            *outputFloats++ = 0.0;
+        }
     }
-    const int memorySize = maxMemory;
-    float temp[memorySize];
-    memcpy(temp, mWriteBuffer.get(), maxMemory);
-    memset(mWriteBuffer.get(), 0, maxMemory);
-    memcpy(mWriteBuffer.get(), temp + size, maxMemory - size);
+
+    LOGD("------- %d, %d, %d, %f", indexWriteBuffer, size, loadPlaySize, mWriteBuffer.get()[0]);
+
+    if(size < loadPlaySize) {
+        indexWriteBuffer = (indexWriteBuffer + size) % loadPlaySize;
+    } else {
+        indexWriteBuffer = 0;
+    }
+}
+
+void FullDuplexStream::setAudioMp3(std::shared_ptr<AAssetDataSource> &audio) {
+    FullDuplexStream::mp3 = audio;
+    loopAudio((void *) mp3->getData(), mp3->getSize());
 }

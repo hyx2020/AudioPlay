@@ -2,6 +2,7 @@
 #include <string>
 #include <android/log.h>
 #include <logging_macros.h>
+#include <android/asset_manager_jni.h>
 
 #include "audio/LiveEffectEngine.h"
 
@@ -21,9 +22,14 @@ Java_org_hyx_lib_1play_lib_JniLib_detection(JNIEnv *env, jobject thiz) {
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_create(JNIEnv *env, jobject thiz) {
+Java_org_hyx_lib_1play_lib_AudioEngine_create(JNIEnv *env, jobject thiz, jobject asset_manager) {
+    AAssetManager *assetManager = AAssetManager_fromJava(env, asset_manager);
+    if (assetManager == nullptr) {
+        LOGE("Could not obtain the AAssetManager");
+        return false;
+    }
     if (engine == nullptr) {
-        engine = new LiveEffectEngine();
+        engine = new LiveEffectEngine(*assetManager);
     }
     return (engine != nullptr) ? JNI_TRUE : JNI_FALSE;
 }
@@ -144,12 +150,14 @@ Java_org_hyx_lib_1play_lib_AudioEngine_setPlayFlag(
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_org_hyx_lib_1play_lib_AudioEngine_sendAudio(JNIEnv *env, jobject thiz, jfloatArray audio, jint size) {
+Java_org_hyx_lib_1play_lib_AudioEngine_loopAudio(JNIEnv *env, jobject thiz, jfloatArray audio, jint size) {
     if (engine == nullptr) {
         LOGE("Engine is null, you must call createEngine before calling this method");
         return;
     }
     jfloat *data = env->GetFloatArrayElements(audio, nullptr);
-    engine->sendAudio(data, size);
+    engine->loopAudio(
+            data,
+            size);
     env->ReleaseFloatArrayElements(audio, data, 0);
 }

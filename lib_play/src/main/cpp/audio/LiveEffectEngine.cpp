@@ -19,9 +19,15 @@
 
 #include "LiveEffectEngine.h"
 
-LiveEffectEngine::LiveEffectEngine() {
+LiveEffectEngine::LiveEffectEngine(AAssetManager &assetManager): mAssetManager(assetManager) {
     assert(mOutputChannelCount == mInputChannelCount);
-}
+    AudioProperties targetProperties {
+            .channelCount = 2,
+            .sampleRate = 48000
+    };
+    mp3 = std::shared_ptr<AAssetDataSource> {
+            AAssetDataSource::newFromCompressedAsset(mAssetManager, "FUNKY_HOUSE.mp3", targetProperties)
+    };}
 
 void LiveEffectEngine::setRecordingDeviceId(int32_t deviceId) {
     mRecordingDeviceId = deviceId;
@@ -104,6 +110,7 @@ oboe::Result  LiveEffectEngine::openStreams() {
 
     mFullDuplexPass.setInputStream(mRecordingStream);
     mFullDuplexPass.setOutputStream(mPlayStream);
+    mFullDuplexPass.setAudioMp3(mp3);
     return result;
 }
 
@@ -250,6 +257,6 @@ void LiveEffectEngine::setPlayFlag(bool flag) {
     mFullDuplexPass.setPlayFlag(flag);
 }
 
-void LiveEffectEngine::sendAudio(float *audio, int size) {
-    mFullDuplexPass.sendAudio(audio, size);
+void LiveEffectEngine::loopAudio(float *audio, int size) {
+    mFullDuplexPass.loopAudio(audio, size);
 }

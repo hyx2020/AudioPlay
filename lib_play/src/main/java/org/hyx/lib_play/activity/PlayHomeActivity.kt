@@ -55,8 +55,14 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
             OboeAudioManager.get(applicationContext)
             delay(100)
             GlobalScope.launch(Dispatchers.Main) {
-                binding.playRecordDeviceSpinner.adapter = SpinnerAdapterFactory.SimpleAdapterList(applicationContext, OboeAudioManager.get(applicationContext).devListStdIn)
-                binding.playPlaybackDeviceSpinner.adapter = SpinnerAdapterFactory.SimpleAdapterList(applicationContext, OboeAudioManager.get(applicationContext).devListStdOut)
+                binding.playRecordDeviceSpinner.adapter = SpinnerAdapterFactory.SimpleAdapterList(
+                    applicationContext,
+                    OboeAudioManager.get(applicationContext).devListStdIn
+                )
+                binding.playPlaybackDeviceSpinner.adapter = SpinnerAdapterFactory.SimpleAdapterList(
+                    applicationContext,
+                    OboeAudioManager.get(applicationContext).devListStdOut
+                )
             }
         }
     }
@@ -98,7 +104,7 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
     override fun onClick(v: View?) {
         when (v?.id) {
             binding.playRecordStart.id -> {
-                if(binding.playRecordStart.text == getString(R.string.play_audio_record_start)) {
+                if (binding.playRecordStart.text == getString(R.string.play_audio_record_start)) {
                     AudioEngine.setEffectOn(true)
                     binding.playRecordStart.text = getString(R.string.play_audio_record_stop)
                     binding.playHomeLog.text = getString(R.string.play_audio_record_start)
@@ -111,7 +117,7 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
                 }
             }
             binding.playPlaybackStart.id -> {
-                if(binding.playPlaybackStart.text == getString(R.string.play_audio_play_start)) {
+                if (binding.playPlaybackStart.text == getString(R.string.play_audio_play_start)) {
                     playStart()
                     binding.playPlaybackStart.text = getString(R.string.play_audio_play_stop)
                     binding.playHomeLog.text = getString(R.string.play_audio_play_start)
@@ -124,8 +130,8 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
         }
     }
 
-    private lateinit var recordSchedule :ScheduledFuture<*>
-    private lateinit var playSchedule :ScheduledFuture<*>
+    private lateinit var recordSchedule: ScheduledFuture<*>
+    private lateinit var playSchedule: ScheduledFuture<*>
     private val saveArray = ArrayList<FloatArray>()
 
     private fun arrayAdd() {
@@ -137,7 +143,7 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
     }
 
     private fun save() {
-        if(!this::recordSchedule.isInitialized) return
+        if (!this::recordSchedule.isInitialized) return
         recordSchedule.cancel(false)
 
         FunShare.schedule.schedule({
@@ -148,17 +154,15 @@ class PlayHomeActivity : PlayBaseActivity(), AdapterView.OnItemSelectedListener,
 
     private fun playStart() {
         AudioEngine.setEffectOn(true)
-        AudioEngine.setPlayFlag(true)
-        val audio = FunShare.getAndPlay(this)
-
-        playSchedule = FunShare.schedule.scheduleWithFixedDelay({
-            AudioEngine.sendAudio(audio, audio.size)
-            println("play once")
-        }, 0, 500, TimeUnit.MILLISECONDS);
+        playSchedule = FunShare.schedule.schedule({
+            val audio = FunShare.getAndPlay(this)
+            AudioEngine.loopAudio(audio, audio.size)
+            AudioEngine.setPlayFlag(true)
+        }, 0, TimeUnit.MILLISECONDS);
     }
 
     private fun playStop() {
-        if(!this::playSchedule.isInitialized) return
+        if (!this::playSchedule.isInitialized) return
         playSchedule.cancel(false)
         FunShare.schedule.schedule({
             AudioEngine.setEffectOn(false)

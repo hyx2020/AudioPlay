@@ -4,6 +4,8 @@ set(APP_SOURCES
         jni_bridge.cpp
         audio/FullDuplexStream.cpp
         audio/LiveEffectEngine.cpp
+        audio/AAssetDataSource.cpp
+        audio/NDKExtractor.cpp
         )
 
 add_library(audio-lib-hyx
@@ -15,9 +17,17 @@ add_library(audio-lib-hyx
 find_library(log-lib
         log)
 
+set (TARGET_LIBS log android oboe GLESv2)
+MESSAGE(STATUS "Using NDK media extractor")
+add_definitions(-DUSE_FFMPEG=0)
+target_sources(audio-lib-hyx PRIVATE ./audio/NDKExtractor.cpp )
+set (TARGET_LIBS ${TARGET_LIBS} mediandk)
+
 target_link_libraries(audio-lib-hyx
         oboe
-        ${log-lib})
+        ${log-lib}
+        ${TARGET_LIBS}
+        )
 
 # Set the path to the Oboe directory.
 set(OBOE_DIR ../../../../../oboe)
