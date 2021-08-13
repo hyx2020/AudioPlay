@@ -10,7 +10,7 @@ ext {
     ]
 
     libVesrion = [
-            kotlin_sn                    : '1.5.10',
+            kotlin_sn                    : '1.5.0',
             appcompat_sn                 : '1.0.2',
             core_ktx_sn                  : '1.0.2',
             constraintlayout_sn          : '1.1.3',
@@ -19,17 +19,25 @@ ext {
             a_router_api_sn              : '1.5.2',
             kotlinx_coroutines_core_sn   : '1.3.9',
             kotlinx_coroutines_android_sn: '1.3.9',
+            nav_version_sn               : '2.3.5',
+            nav_compose_sn               : '2.4.0-alpha06'
     ]
 
     lib = [
-            kotlin_version                    : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${libVesrion.kotlin_sn}",
-            core_ktx_version                  : "androidx.core:core-ktx:${libVesrion.core_ktx_sn}",
-            appcompat_version                 : "androidx.appcompat:appcompat:${libVesrion.appcompat_sn}",
-            constraintlayout_version          : "androidx.constraintlayout:constraintlayout:${libVesrion.constraintlayout_sn}",
-            google_material_version           : "com.google.android.material:material:${libVesrion.google_material_sn}",
-            a_router_version                  : "com.alibaba:arouter-compiler:${libVesrion.a_router_sn}",
-            a_router_api_version              : "com.alibaba:arouter-api:${libVesrion.a_router_api_sn}",
-            kotlinx_coroutines_core_version   : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${libVesrion.kotlinx_coroutines_core_sn}",
-            kotlinx_coroutines_android_version: "org.jetbrains.kotlinx:kotlinx-coroutines-android:${libVesrion.kotlinx_coroutines_android_sn}"
+            kotlin_version                     : "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${libVesrion.kotlin_sn}",
+            core_ktx_version                   : "androidx.core:core-ktx:${libVesrion.core_ktx_sn}",
+            appcompat_version                  : "androidx.appcompat:appcompat:${libVesrion.appcompat_sn}",
+            constraintlayout_version           : "androidx.constraintlayout:constraintlayout:${libVesrion.constraintlayout_sn}",
+            google_material_version            : "com.google.android.material:material:${libVesrion.google_material_sn}",
+            a_router_version                   : "com.alibaba:arouter-compiler:${libVesrion.a_router_sn}",
+            a_router_api_version               : "com.alibaba:arouter-api:${libVesrion.a_router_api_sn}",
+            kotlinx_coroutines_core_version    : "org.jetbrains.kotlinx:kotlinx-coroutines-core:${libVesrion.kotlinx_coroutines_core_sn}",
+            kotlinx_coroutines_android_version : "org.jetbrains.kotlinx:kotlinx-coroutines-android:${libVesrion.kotlinx_coroutines_android_sn}",
+            navigation_fragment_java_version   : "androidx.navigation:navigation-fragment:${libVesrion.nav_version_sn}",
+            navigation_fragment_ui_java_version: "androidx.navigation:navigation-ui:${libVesrion.nav_version_sn}",
+            navigation_fragment_ktx_version    : "androidx.navigation:navigation-fragment-ktx:${libVesrion.nav_version_sn}",
+            navigation_fragment_ui_ktx_version : "androidx.navigation:navigation-ui-ktx:${libVesrion.nav_version_sn}",
+            navigation_fragment_feature_version: "androidx.navigation:navigation-dynamic-features-fragment:${libVesrion.nav_version_sn}",
+            navigation_compose_version         : "androidx.navigation:navigation-compose:${libVesrion.nav_compose_sn}",
     ]
 }

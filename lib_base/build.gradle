@@ -71,10 +71,19 @@ dependencies {
 
     api rootProject.lib.kotlinx_coroutines_android_version
 
+    //导航组件添加
+    api rootProject.lib.navigation_fragment_java_version
+    api rootProject.lib.navigation_fragment_ui_java_version
+    api rootProject.lib.navigation_fragment_ktx_version
+    api rootProject.lib.navigation_fragment_ui_ktx_version
+    api rootProject.lib.navigation_fragment_feature_version
+    api rootProject.lib.navigation_compose_version
+
     kapt rootProject.lib.a_router_version
     api rootProject.lib.a_router_api_version
 
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+    androidTestImplementation "androidx.navigation:navigation-testing:${libVesrion.nav_compose_sn}"
 }
